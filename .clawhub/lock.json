@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "vercel-react-best-practices": {
+      "version": "1.0.0",
+      "installedAt": 1770147153540
+    },
+    "vercel-deploy-claimable": {
+      "version": "1.0.0",
+      "installedAt": 1770147155256
+    },
+    "vercel-config-gen": {
+      "version": "1.0.0",
+      "installedAt": 1770147157415
+    },
+    "skill-creator": {
+      "version": "0.1.0",
+      "installedAt": 1770147191050
+    },
+    "agent-browser": {
+      "version": "0.2.0",
+      "installedAt": 1770147192528
+    },
+    "find-skills": {
+      "version": "0.1.0",
+      "installedAt": 1770147239821
+    }
+  }
+}
