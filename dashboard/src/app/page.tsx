@@ -3,8 +3,18 @@
 import { useState } from 'react'
 import { AgentCard, ScoreRing } from '@/components'
 
+type Trend = 'up' | 'stable' | 'down'
+type AgentData = {
+  id: string
+  name: string
+  score: number
+  trend: Trend
+  attestations: number
+  tags: string[]
+}
+
 // Mock data for demo
-const mockAgents = [
+const mockAgents: AgentData[] = [
   { id: 'shadowbuilder', name: 'ShadowBuilder', score: 92, trend: 'up', attestations: 47, tags: ['infra', 'ai'] },
   { id: 'bountyboard', name: 'BountyBoard', score: 88, trend: 'stable', attestations: 32, tags: ['defi', 'payments'] },
   { id: 'sipher', name: 'Sipher', score: 85, trend: 'up', attestations: 28, tags: ['privacy'] },
