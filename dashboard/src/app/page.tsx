@@ -89,7 +89,7 @@ function AgentCard({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className="text-sm">{medals[index]}</span>
-          <div className="flex h-8 w-8 items-center justify-center rounded bg-zinc-700 text-sm font-medium">
+          <div className="flex size-8 items-center justify-center rounded bg-zinc-700 text-sm font-medium">
             {agent.name.charAt(0)}
           </div>
           <div>
@@ -178,7 +178,7 @@ export default function Dashboard() {
   if (!mounted) return null
 
   return (
-    <div className="min-h-screen bg-zinc-950 p-4 md:p-6">
+    <div className="min-h-dvh bg-zinc-950 p-4 md:p-6">
       {/* Header */}
       <header className="mb-6 max-w-6xl">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
