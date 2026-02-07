@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'motion/react'
+import { motion, AnimatePresence } from 'motion/react'
 import { cn } from '@/lib/utils'
-import { DecryptedText, CountUp, FaultyTerminal, GlitchText } from '@/components/reactbits'
+import { DecryptedText, CountUp, FaultyTerminal, GlitchText, SpotlightCard } from '@/components/reactbits'
 
 type Trend = 'up' | 'stable' | 'down'
 
@@ -48,6 +48,16 @@ const AGENT_WALLETS: Record<string, string> = {
   notagent: 'CFaXxN9fqowBQUa5bjYeHejHu8kUZGoqLJ1zMC1QEsKa'
 }
 
+const DEFAULT_AGENTS: LeaderboardAgent[] = [
+  { id: 'shadowbuilder', name: 'ShadowBuilder', score: 92, trend: 'up', attestations: 47, wallet: AGENT_WALLETS.shadowbuilder },
+  { id: 'said', name: 'SAID Protocol', score: 94, trend: 'stable', attestations: 56, wallet: AGENT_WALLETS.said },
+  { id: 'bountyboard', name: 'BountyBoard', score: 88, trend: 'up', attestations: 32, wallet: AGENT_WALLETS.bountyboard },
+  { id: 'sipher', name: 'Sipher', score: 85, trend: 'up', attestations: 28, wallet: AGENT_WALLETS.sipher },
+  { id: 'level5', name: 'Level 5', score: 82, trend: 'stable', attestations: 24, wallet: AGENT_WALLETS.level5 },
+  { id: 'claude', name: 'ClaudeCraft', score: 78, trend: 'up', attestations: 19, wallet: AGENT_WALLETS.claude },
+  { id: 'notagent', name: 'Not Agent', score: 86, trend: 'up', attestations: 0, wallet: AGENT_WALLETS.notagent },
+]
+
 async function fetchAgentData(agentId: string): Promise<AgentData | null> {
   try {
     const res = await fetch(`/api/reputation/${agentId}`)
@@ -77,7 +87,7 @@ function StatCard({ label, value, delay = 0 }: { label: string; value: number | 
       className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-4 backdrop-blur-sm"
     >
       <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">{label}</p>
-      <p className="mt-2 text-2xl font-semibold text-zinc-100 tabular-nums">
+      <p className="mt-2 text-2xl font-semibold text-white tabular-nums font-mono">
         {typeof value === 'number' ? <CountUp end={value} duration={1.5} /> : value}
       </p>
     </motion.div>
@@ -100,10 +110,12 @@ function AgentCard({
   
   return (
     <motion.button
+      type="button"
       onClick={onClick}
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.15, ease: 'easeOut' }}
+      aria-label={`View ${agent.name} with trust score ${agent.score}`}
       className={cn(
         'group w-full rounded-lg p-3 text-left transition-all',
         isSelected 
@@ -113,7 +125,7 @@ function AgentCard({
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-sm">{medals[index] || ''}</span>
+          <span className="text-sm w-5">{medals[index] || ''}</span>
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500/20 to-green-500/20 text-sm font-medium ring-1 ring-white/10">
             {agent.name.charAt(0)}
           </div>
@@ -127,10 +139,12 @@ function AgentCard({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className={cn('text-sm font-semibold tabular-nums', trendColors[agent.trend])}>
-            {agent.score}
+          <span className={cn('text-sm font-semibold tabular-nums font-mono', trendColors[agent.trend])}>
+            <CountUp end={agent.score} duration={1} />
           </span>
-          <span className="text-lg">{agent.trend === 'up' ? '↑' : agent.trend === 'down' ? '↓' : '→'}</span>
+          <span className={cn('text-lg', trendColors[agent.trend])}>
+            {agent.trend === 'up' ? '↑' : agent.trend === 'down' ? '↓' : '→'}
+          </span>
         </div>
       </div>
     </motion.button>
@@ -142,7 +156,7 @@ function ProgressBar({ value, label, color = 'bg-purple-500' }: { value: number;
     <div className="space-y-1">
       <div className="flex justify-between text-xs">
         <span className="text-zinc-400">{label}</span>
-        <CountUp end={value} duration={1} className="text-zinc-300 tabular-nums" />
+        <CountUp end={value} duration={1} className="text-zinc-300 tabular-nums font-mono" />
       </div>
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
         <motion.div
@@ -187,7 +201,7 @@ function ScoreRing({ score }: { score: number }) {
           strokeLinecap="round"
         />
       </svg>
-      <div className="absolute text-xl font-bold tabular-nums" style={{ color }}>
+      <div className="absolute text-xl font-bold tabular-nums font-mono" style={{ color }}>
         <CountUp end={score} duration={1} />
       </div>
     </div>
@@ -202,21 +216,19 @@ function BlockchainBadge({ transactions, programs }: { transactions: number; pro
       </div>
       <div className="flex-1">
         <p className="text-xs text-zinc-400">On-Chain Activity</p>
-        <p className="text-xs text-zinc-500">{transactions} transactions • {programs.length} programs</p>
+        <p className="text-xs text-zinc-500 tabular-nums font-mono">{transactions} TXs • {programs.length} programs</p>
       </div>
     </div>
   )
 }
 
 export default function Dashboard() {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardAgent[]>([])
+  const [leaderboard, setLeaderboard] = useState<LeaderboardAgent[]>(DEFAULT_AGENTS)
   const [selectedAgentId, setSelectedAgentId] = useState('notagent')
   const [agentData, setAgentData] = useState<AgentData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
     loadData()
   }, [])
 
@@ -226,7 +238,7 @@ export default function Dashboard() {
       fetchLeaderboard(),
       fetchAgentData(selectedAgentId)
     ])
-    setLeaderboard(lb)
+    if (lb.length > 0) setLeaderboard(lb)
     setAgentData(ad)
     setLoading(false)
   }
@@ -235,15 +247,15 @@ export default function Dashboard() {
     fetchAgentData(selectedAgentId).then(setAgentData)
   }, [selectedAgentId])
 
-  if (!mounted) return null
-
   const avgScore = leaderboard.length > 0 
     ? Math.round(leaderboard.reduce((a, b) => a + b.score, 0) / leaderboard.length)
     : 0
 
+  const selectedAgent = leaderboard.find(a => a.id === selectedAgentId) || DEFAULT_AGENTS.find(a => a.id === selectedAgentId)!
+
   return (
-    <div className="min-h-dvh bg-[#0D0D0D] p-4 md:p-6 relative">
-      {/* Background Effects */}
+    <div className="min-h-dvh bg-[#0D0D0D] p-4 md:p-6 relative font-sans">
+      {/* Background Effects - Faulty Terminal for "Shadow → Revealed" aesthetic */}
       <FaultyTerminal tint="#9945FF" glitchAmount={0.2} scanlineIntensity={0.3} mouseReact={true} />
       
       {/* Header */}
@@ -254,7 +266,7 @@ export default function Dashboard() {
               text="ShadowTrust" 
               speed={80}
               intensity={0.4}
-              className="text-3xl font-semibold tracking-tight text-white"
+              className="text-3xl font-semibold tracking-tight text-white font-display"
             />
             <motion.p 
               initial={{ opacity: 0 }}
@@ -274,9 +286,9 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Stats */}
+      {/* Stats - Rolling numbers feel like live ledger */}
       <div className="mb-6 grid max-w-6xl grid-cols-2 gap-2 sm:grid-cols-4 relative z-10">
-        <StatCard label="Agents" value={leaderboard.length || 7} delay={0} />
+        <StatCard label="Agents" value={leaderboard.length} delay={0} />
         <StatCard label="Avg Trust" value={avgScore || 85} delay={0.05} />
         <StatCard 
           label="Wallet Balance" 
@@ -288,133 +300,131 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 lg:grid-cols-3 relative z-10">
-        {/* Leaderboard */}
+        {/* Leaderboard - Accessible keyboard navigation */}
         <section className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 backdrop-blur-sm">
           <h2 className="mb-3 text-sm font-medium text-zinc-400">Leaderboard</h2>
-          <div className="space-y-1">
-            {leaderboard.length > 0 ? (
-              leaderboard.map((agent, index) => (
-                <AgentCard
-                  key={agent.id}
-                  agent={agent}
-                  isSelected={selectedAgentId === agent.id}
-                  onClick={() => setSelectedAgentId(agent.id)}
-                  index={index}
-                />
-              ))
-            ) : (
-              // Fallback to default agents
-              Object.entries(AGENT_WALLETS).slice(0, 7).map(([id, wallet], index) => (
-                <AgentCard
-                  key={id}
-                  agent={{ id, name: id.charAt(0).toUpperCase() + id.slice(1).replace(/([A-Z])/g, ' $1'), score: 70 + Math.floor(Math.random() * 25), trend: 'stable', attestations: Math.floor(Math.random() * 50), wallet }}
-                  isSelected={selectedAgentId === id}
-                  onClick={() => setSelectedAgentId(id)}
-                  index={index}
-                />
-              ))
-            )}
+          <div className="space-y-1" role="list" aria-label="Agent leaderboard">
+            {leaderboard.map((agent, index) => (
+              <AgentCard
+                key={agent.id}
+                agent={agent}
+                isSelected={selectedAgentId === agent.id}
+                onClick={() => setSelectedAgentId(agent.id)}
+                index={index}
+              />
+            ))}
           </div>
         </section>
 
-        {/* Agent Details */}
+        {/* Agent Details - Spotlight on trust */}
         <section className="space-y-4 lg:col-span-2">
-          {loading ? (
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-8 text-center">
-              <div className="animate-spin h-8 w-8 border-2 border-purple-500 border-t-transparent rounded-full mx-auto" />
-              <p className="mt-4 text-zinc-500">Loading agent data...</p>
-            </div>
-          ) : agentData ? (
-            <>
-              {/* Agent Profile */}
+          <AnimatePresence mode="wait">
+            {loading ? (
               <motion.div 
-                className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-sm"
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-8 text-center"
+              >
+                <div className="animate-spin h-8 w-8 border-2 border-purple-500 border-t-transparent rounded-full mx-auto" />
+                <p className="mt-4 text-zinc-500">Loading agent data...</p>
+              </motion.div>
+            ) : agentData ? (
+              <motion.div
+                key={agentData.agentId}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/20 to-green-500/20 text-xl font-medium ring-1 ring-white/10">
-                      {agentData.name.charAt(0)}
+                {/* Agent Profile - SpotlightCard for premium feel */}
+                <SpotlightCard
+                  className="p-5"
+                  spotlightColor="rgba(153, 69, 255, 0.15)"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/20 to-green-500/20 text-xl font-medium ring-1 ring-white/10">
+                        {agentData.name.charAt(0)}
+                      </div>
+                      <div>
+                        <DecryptedText 
+                          text={agentData.name}
+                          speed={50}
+                          className="text-xl font-medium text-white font-display"
+                        />
+                        <p className="text-xs text-zinc-500 font-mono mt-1">
+                          {agentData.walletAddress.slice(0, 12)}...{agentData.walletAddress.slice(-8)}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <DecryptedText 
-                        text={agentData.name}
-                        speed={50}
-                        className="text-xl font-medium text-white"
-                      />
-                      <p className="text-xs text-zinc-500 font-mono mt-1">
-                        {agentData.walletAddress.slice(0, 12)}...{agentData.walletAddress.slice(-8)}
+                    <ScoreRing score={agentData.overall} />
+                  </div>
+                </SpotlightCard>
+
+                {/* Blockchain Data */}
+                <SpotlightCard
+                  className="p-5 mt-4"
+                  spotlightColor="rgba(249, 115, 22, 0.1)"
+                >
+                  <BlockchainBadge 
+                    transactions={agentData.onChainData.transactions}
+                    programs={agentData.onChainData.programs}
+                  />
+                  <div className="mt-4 grid grid-cols-2 gap-3">
+                    <div className="rounded-lg bg-zinc-900/50 p-3">
+                      <p className="text-xs text-zinc-500">Balance</p>
+                      <p className="text-lg font-semibold text-white tabular-nums font-mono">{agentData.onChainData.balance}</p>
+                    </div>
+                    <div className="rounded-lg bg-zinc-900/50 p-3">
+                      <p className="text-xs text-zinc-500">Last Active</p>
+                      <p className="text-sm font-medium text-white">
+                        {new Date(agentData.onChainData.lastActive).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
-                  <ScoreRing score={agentData.overall} />
-                </div>
-              </motion.div>
+                </SpotlightCard>
 
-              {/* Blockchain Data */}
-              <motion.div 
-                className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-sm"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
-              >
-                <BlockchainBadge 
-                  transactions={agentData.onChainData.transactions}
-                  programs={agentData.onChainData.programs}
-                />
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  <div className="rounded-lg bg-zinc-900/50 p-3">
-                    <p className="text-xs text-zinc-500">Balance</p>
-                    <p className="text-lg font-semibold text-white">{agentData.onChainData.balance}</p>
+                {/* Score Breakdown */}
+                <SpotlightCard
+                  className="p-5 mt-4"
+                  spotlightColor="rgba(20, 241, 149, 0.1)"
+                >
+                  <h3 className="mb-4 text-sm font-medium text-zinc-400">Score Breakdown</h3>
+                  <div className="space-y-4">
+                    <ProgressBar value={agentData.breakdown.identityVerification} label="Identity Verification" color="bg-purple-500" />
+                    <ProgressBar value={agentData.breakdown.taskCompletion} label="Task Completion" color="bg-green-500" />
+                    <ProgressBar value={agentData.breakdown.paymentHistory} label="Payment History" color="bg-blue-500" />
+                    <ProgressBar value={agentData.breakdown.onChainActivity} label="On-Chain Activity" color="bg-orange-500" />
                   </div>
-                  <div className="rounded-lg bg-zinc-900/50 p-3">
-                    <p className="text-xs text-zinc-500">Last Active</p>
-                    <p className="text-sm font-medium text-white">
-                      {new Date(agentData.onChainData.lastActive).toLocaleDateString()}
-                    </p>
+                </SpotlightCard>
+
+                {/* Programs */}
+                <SpotlightCard
+                  className="p-5 mt-4"
+                  spotlightColor="rgba(59, 130, 246, 0.1)"
+                >
+                  <h3 className="mb-3 text-sm font-medium text-zinc-400">Programs Interacted</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {agentData.onChainData.programs.map((program) => (
+                      <span key={program} className="rounded-lg bg-zinc-900/70 px-3 py-1.5 text-xs text-zinc-400 ring-1 ring-zinc-800 font-mono">
+                        {program}
+                      </span>
+                    ))}
                   </div>
-                </div>
+                </SpotlightCard>
               </motion.div>
-
-              {/* Score Breakdown */}
+            ) : (
               <motion.div 
-                className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-sm"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
+                key="notfound"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-8 text-center text-zinc-500"
               >
-                <h3 className="mb-4 text-sm font-medium text-zinc-400">Score Breakdown</h3>
-                <div className="space-y-4">
-                  <ProgressBar value={agentData.breakdown.identityVerification} label="Identity Verification" color="bg-purple-500" />
-                  <ProgressBar value={agentData.breakdown.taskCompletion} label="Task Completion" color="bg-green-500" />
-                  <ProgressBar value={agentData.breakdown.paymentHistory} label="Payment History" color="bg-blue-500" />
-                  <ProgressBar value={agentData.breakdown.onChainActivity} label="On-Chain Activity" color="bg-orange-500" />
-                </div>
+                Agent not found
               </motion.div>
-
-              {/* Programs */}
-              <motion.div 
-                className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-sm"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 }}
-              >
-                <h3 className="mb-3 text-sm font-medium text-zinc-400">Programs Interacted</h3>
-                <div className="flex flex-wrap gap-2">
-                  {agentData.onChainData.programs.map((program) => (
-                    <span key={program} className="rounded-lg bg-zinc-900/70 px-3 py-1.5 text-xs text-zinc-400 ring-1 ring-zinc-800">
-                      {program}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-            </>
-          ) : (
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-8 text-center text-zinc-500">
-              Agent not found
-            </div>
-          )}
+            )}
+          </AnimatePresence>
         </section>
       </div>
 
