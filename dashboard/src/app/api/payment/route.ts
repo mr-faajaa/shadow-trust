@@ -28,14 +28,12 @@ export async function GET(request: NextRequest) {
   }
   
   // Return 402 Payment Required with challenge
-  const response = NextResponse.json({ challenge })
+  const response = NextResponse.json({ challenge }, { status: 402 })
   
   // Add x402 headers
   Object.entries(challenge.headers).forEach(([key, value]) => {
     response.headers.set(key, value)
   })
-  
-  response.status = 402
   
   return response
 }
