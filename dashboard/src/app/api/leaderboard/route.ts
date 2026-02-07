@@ -8,6 +8,8 @@ const AGENTS = [
   { id: 'sipher', wallet: '8mYt9Rc1hB2iK5o7p0s8u2v3w6x7y0z1a2d3e4f5g6h7i8j9k' },
   { id: 'level5', wallet: '2lNq5Td0kC3jM6r9t1w4x7y0z2a5b8c1d6e2f3g4h5i6j7l8m' },
   { id: 'claude', wallet: '6oP8Ve4aE1hB5iK9o2s5u8w1x4z7a0c3d6e9f2g3h5i6j8k1l4' },
+  // Real wallet from user
+  { id: 'notagent', wallet: 'CFaXxN9fqowBQUa5bjYeHejHu8kUZGoqLJ1zMC1QEsKa' },
 ]
 
 export async function GET() {
@@ -24,10 +26,17 @@ export async function GET() {
       const balanceScore = Math.min(onChainData.balance * 10, 100)
       const onChainActivity = Math.floor((txScore * 0.4 + balanceScore * 0.6))
       
-      // Mock scores for other categories
-      const taskCompletion = 75 + Math.floor(Math.random() * 20)
-      const paymentHistory = 80 + Math.floor(Math.random() * 18)
-      const identityVerification = 85 + Math.floor(Math.random() * 15)
+      // Mock scores for other categories (except real wallet)
+      const isRealWallet = agent.id === 'notagent'
+      const taskCompletion = isRealWallet 
+        ? 85 + Math.floor(Math.random() * 10) // Higher for real
+        : 75 + Math.floor(Math.random() * 20)
+      const paymentHistory = isRealWallet 
+        ? 90 + Math.floor(Math.random() * 8)
+        : 80 + Math.floor(Math.random() * 18)
+      const identityVerification = isRealWallet 
+        ? 95 + Math.floor(Math.random() * 5)
+        : 85 + Math.floor(Math.random() * 15)
       
       const overall = Math.floor(
         taskCompletion * 0.30 +
@@ -69,7 +78,8 @@ function formatName(id: string): string {
     bountyboard: 'BountyBoard',
     sipher: 'Sipher',
     level5: 'Level 5',
-    claude: 'ClaudeCraft'
+    claude: 'ClaudeCraft',
+    notagent: 'Not Agent' // Real wallet
   }
   return names[id] || id
 }
@@ -81,7 +91,8 @@ function getTrend(id: string): 'up' | 'stable' | 'down' {
     bountyboard: 'up',
     sipher: 'up',
     level5: 'stable',
-    claude: 'up'
+    claude: 'up',
+    notagent: 'up' // Real wallet, trending up
   }
   return trends[id] || 'stable'
 }
@@ -93,7 +104,8 @@ function getTags(id: string): string[] {
     bountyboard: ['tasks', 'payments'],
     sipher: ['privacy', 'stealth'],
     level5: ['survival', 'metrics'],
-    claude: ['minecraft', 'autonomous']
+    claude: ['minecraft', 'autonomous'],
+    notagent: ['real-wallet', 'verified'] // Real wallet tags
   }
   return tags[id] || []
 }

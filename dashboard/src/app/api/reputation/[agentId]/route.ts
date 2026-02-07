@@ -8,7 +8,9 @@ const AGENT_WALLETS: Record<string, string> = {
   bountyboard: '5nXs7Pb8h0gK1jL4m5n6Op7q9r2s3t4u5v6w8x9y0z1a2b3c',
   sipher: '8mYt9Rc1hB2iK5o7p0s8u2v3w6x7y0z1a2d3e4f5g6h7i8j9k',
   level5: '2lNq5Td0kC3jM6r9t1w4x7y0z2a5b8c1d6e2f3g4h5i6j7l8m',
-  claude: '6oP8Ve4aE1hB5iK9o2s5u8w1x4z7a0c3d6e9f2g3h5i6j8k1l4'
+  claude: '6oP8Ve4aE1hB5iK9o2s5u8w1x4z7a0c3d6e9f2g3h5i6j8k1l4',
+  // Real wallet from user
+  notagent: 'CFaXxN9fqowBQUa5bjYeHejHu8kUZGoqLJ1zMC1QEsKa'
 }
 
 // Mock reputation breakdown weights
@@ -41,7 +43,7 @@ export async function GET(
   // - x402 payments
   // - On-chain activity
   
-  const reputation = calculateReputation(onChainData)
+  const reputation = calculateReputation(onChainData, agentId)
   
   // Generate response
   const response = {
@@ -65,7 +67,7 @@ export async function GET(
   return NextResponse.json(response)
 }
 
-function calculateReputation(onChainData: any) {
+function calculateReputation(onChainData: any, agentId: string) {
   // Calculate on-chain score based on activity
   const txScore = Math.min(onChainData.transactions * 2, 100)
   const balanceScore = Math.min(onChainData.balance * 10, 100)
@@ -73,11 +75,20 @@ function calculateReputation(onChainData: any) {
   
   const onChainScore = (txScore * 0.4 + balanceScore * 0.3 + programScore * 0.3)
   
+  // Real wallet gets higher mock scores
+  const isRealWallet = agentId === 'notagent'
+  
   // Mock scores for other categories (in production, would come from partner APIs)
   const breakdown = {
-    taskCompletion: Math.floor(75 + Math.random() * 20),
-    paymentHistory: Math.floor(80 + Math.random() * 18),
-    identityVerification: Math.floor(85 + Math.random() * 15),
+    taskCompletion: isRealWallet 
+      ? Math.floor(85 + Math.random() * 10)
+      : Math.floor(75 + Math.random() * 20),
+    paymentHistory: isRealWallet 
+      ? Math.floor(90 + Math.random() * 8)
+      : Math.floor(80 + Math.random() * 18),
+    identityVerification: isRealWallet 
+      ? Math.floor(95 + Math.random() * 5)
+      : Math.floor(85 + Math.random() * 15),
     onChainActivity: Math.floor(onChainScore)
   }
   
@@ -100,7 +111,8 @@ function calculateTrend(agentId: string): 'up' | 'stable' | 'down' {
     bountyboard: 'up',
     sipher: 'up',
     level5: 'stable',
-    claude: 'up'
+    claude: 'up',
+    notagent: 'up' // Real wallet, trending up
   }
   return trends[agentId] || 'stable'
 }
@@ -112,7 +124,8 @@ function formatAgentName(agentId: string): string {
     bountyboard: 'BountyBoard',
     sipher: 'Sipher',
     level5: 'Level 5',
-    claude: 'ClaudeCraft'
+    claude: 'ClaudeCraft',
+    notagent: 'Not Agent' // Real wallet
   }
   return names[agentId] || agentId
 }
