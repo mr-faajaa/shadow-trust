@@ -130,6 +130,85 @@ Skills provide your tools. When you need one, check its `SKILL.md`. Keep local n
 - **Discord links:** Wrap multiple links in `<>` to suppress embeds: `<https://example.com>`
 - **WhatsApp:** No headers — use **bold** or CAPS for emphasis
 
+---
+
+## � Git & Project Repository Management
+
+**CRITICAL LESSON LEARNED:** On 2026-02-07, running `git add -A` from the OpenClaw workspace (`/home/ubuntu/.openclaw/workspace/`) accidentally committed 635 OpenClaw workspace files (skills, MEMORY.md, AGENTS.md, etc.) into the ShadowTrust project repository. This polluted a clean project repo.
+
+### Never Do This Again
+
+**RULE 1: Always `cd` into the project directory first**
+```bash
+# WRONG - Adds OpenClaw workspace files to project
+cd /home/ubuntu/.openclaw/workspace
+git add -A
+git commit -m "..."
+
+# CORRECT - Only affects the project
+cd /home/ubuntu/.openclaw/workspace/shadow-trust
+git add -A
+git commit -m "..."
+```
+
+**RULE 2: Use explicit paths, never wildcard `git add -A` from workspace root**
+```bash
+# PREFERRED - Explicit file selection
+cd /path/to/project
+git add src/ package.json README.md
+git commit -m "description"
+
+# ACCEPTABLE - Only if already in project directory
+cd /path/to/project
+git add -A
+```
+
+**RULE 3: Check git status before committing**
+```bash
+cd /path/to/project
+git status  # Verify only project files are modified
+git add -A
+```
+
+**RULE 4: Project repos live in workspace but are NOT part of OpenClaw**
+- `/home/ubuntu/.openclaw/workspace/shadow-trust/` = ShadowTrust project (independent git repo)
+- `/home/ubuntu/.openclaw/workspace/skills/` = OpenClaw skills (OpenClaw's own files)
+
+### When Working on Project Repos
+
+1. **Always `cd` into the project directory first**
+2. **Verify git status shows only project files**
+3. **Use explicit `git add <files>` when possible**
+4. **Never run `git add -A` from `/home/ubuntu/.openclaw/workspace/`**
+
+### If You Accidentally Pollute a Repo
+
+1. **Detect it:**
+   ```bash
+   cd /path/to/project
+   git status  # Shows unexpected files
+   git log --oneline  # Shows commits with workspace files
+   ```
+
+2. **Fix it:**
+   ```bash
+   # Create a clean clone
+   cd /tmp
+   mkdir project-clean
+   cd project-clean
+   git clone https://github.com/user/project.git .
+   # Copy only project files from polluted repo
+   cp -r /path/to/polluted/project/src .
+   cp -r /path/to/polluted/project/*.json .
+   git add -A
+   git commit -m "Clean project (remove workspace pollution)"
+   git push origin main --force
+   ```
+
+3. **Notify the user** immediately when this happens
+
+---
+
 ## 💓 Heartbeats - Be Proactive!
 
 When you receive a heartbeat poll (message matches the configured heartbeat prompt), don't just reply `HEARTBEAT_OK` every time. Use heartbeats productively!
