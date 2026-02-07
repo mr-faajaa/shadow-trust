@@ -163,7 +163,11 @@ let solanaServiceInstance: SolanaService | null = null
 export function getSolanaService(): SolanaService {
   if (!solanaServiceInstance) {
     const rpcUrl = process.env.SOLANA_RPC_URL
-    solanaServiceInstance = new SolanaService({ rpcUrl })
+    if (rpcUrl) {
+      solanaServiceInstance = new SolanaService({ rpcUrl })
+    } else {
+      solanaServiceInstance = new SolanaService()
+    }
   }
   return solanaServiceInstance
 }
