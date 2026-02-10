@@ -90,6 +90,13 @@ function AgentCard({
     >
       <motion.button
         onClick={onClick}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick();
+          }
+        }}
+        aria-label={`View ${agent.name} with trust score ${agent.score}`}
         initial={{ opacity: 0, x: -8 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: index * 0.05, duration: 0.15, ease: 'easeOut' }}
@@ -102,8 +109,8 @@ function AgentCard({
       >
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-sm">{medals[index] || '#' + (index + 1)}</span>
-            <div className="flex size-8 items-center justify-center rounded bg-zinc-700 text-sm font-medium">
+            <span className="text-sm" aria-hidden="true">{medals[index] || '#' + (index + 1)}</span>
+            <div className="flex size-8 items-center justify-center rounded bg-zinc-700 text-sm font-medium" aria-hidden="true">
               {agent.name.charAt(0)}
             </div>
             <div>
@@ -297,6 +304,7 @@ export default function Dashboard() {
             placeholder="Search agents..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search agents by name"
             className="mb-3 w-full rounded-lg border border-zinc-700/50 bg-zinc-900/80 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 backdrop-blur-sm"
           />
           <AnimatedList
@@ -396,9 +404,11 @@ export default function Dashboard() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 + i * 0.03 }}
                     className="flex items-center justify-between rounded-lg bg-zinc-900/50 p-3"
+                    role="listitem"
+                    aria-label={`Attestation from ${att.source}: ${att.type}, value ${att.value}`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">{att.icon}</span>
+                      <span className="text-lg" aria-hidden="true">{att.icon}</span>
                       <div>
                         <DecryptedText 
                           text={att.source}
@@ -413,6 +423,7 @@ export default function Dashboard() {
                       duration={0.8}
                       prefix="+"
                       className="text-sm font-medium text-green-400 tabular-nums"
+                      aria-label={`Score value ${att.value}`}
                     />
                   </motion.div>
                 ))}
