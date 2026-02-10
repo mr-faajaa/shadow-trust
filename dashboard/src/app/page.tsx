@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'motion/react'
 import { cn } from '@/lib/utils'
-import { DecryptedText, CountUp, FaultyTerminal, GlitchText, RollingNumber } from '@/components/reactbits'
+import { DecryptedText, CountUp, FaultyTerminal, GlitchText, RollingNumber, AnimatedList, SpotlightCard, Skeleton, ParticleField, ShimmerText } from '@/components/reactbits'
 
 type Trend = 'up' | 'stable' | 'down'
 type AgentData = {
@@ -83,46 +83,52 @@ function AgentCard({
   const medals = ['🥇', '🥈', '🥉']
   
   return (
-    <motion.button
-      onClick={onClick}
-      initial={{ opacity: 0, x: -8 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.15, ease: 'easeOut' }}
-      className={cn(
-        'group relative w-full rounded-lg p-3 text-left transition-colors',
-        isSelected 
-          ? 'bg-zinc-800 ring-1 ring-zinc-600' 
-          : 'hover:bg-zinc-800/50'
-      )}
+    <SpotlightCard
+      color={agent.score >= 80 ? '#22c55e' : agent.score >= 60 ? '#eab308' : '#ef4444'}
+      intensity={0.8}
+      className="w-full"
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-sm">{medals[index]}</span>
-          <div className="flex size-8 items-center justify-center rounded bg-zinc-700 text-sm font-medium">
-            {agent.name.charAt(0)}
+      <motion.button
+        onClick={onClick}
+        initial={{ opacity: 0, x: -8 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: index * 0.05, duration: 0.15, ease: 'easeOut' }}
+        className={cn(
+          'group relative w-full rounded-lg p-3 text-left transition-colors',
+          isSelected 
+            ? 'bg-zinc-800 ring-1 ring-zinc-600' 
+            : 'hover:bg-zinc-800/50'
+        )}
+      >
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">{medals[index] || '#' + (index + 1)}</span>
+            <div className="flex size-8 items-center justify-center rounded bg-zinc-700 text-sm font-medium">
+              {agent.name.charAt(0)}
+            </div>
+            <div>
+              <DecryptedText 
+                text={agent.name} 
+                speed={40}
+                className="text-sm font-medium text-zinc-100"
+              />
+              <p className="text-xs text-zinc-500">{agent.tags.join(', ')}</p>
+            </div>
           </div>
-          <div>
-            <DecryptedText 
-              text={agent.name} 
-              speed={40}
-              className="text-sm font-medium text-zinc-100"
+          <div className="flex items-center gap-1">
+            <CountUp 
+              end={agent.score} 
+              duration={1.2}
+              className={cn(
+                'text-sm font-semibold tabular-nums',
+                agent.score >= 80 ? 'text-green-400' :
+                agent.score >= 60 ? 'text-yellow-400' : 'text-red-400'
+              )}
             />
-            <p className="text-xs text-zinc-500">{agent.tags.join(', ')}</p>
           </div>
         </div>
-        <div className="flex items-center gap-1">
-          <CountUp 
-            end={agent.score} 
-            duration={1.2}
-            className={cn(
-              'text-sm font-semibold tabular-nums',
-              agent.score >= 80 ? 'text-green-400' :
-              agent.score >= 60 ? 'text-yellow-400' : 'text-red-400'
-            )}
-          />
-        </div>
-      </div>
-    </motion.button>
+      </motion.button>
+    </SpotlightCard>
   )
 }
 
@@ -202,13 +208,20 @@ export default function Dashboard() {
   if (!mounted) return null
 
   return (
-    <div className="min-h-dvh bg-zinc-950 p-4 md:p-6 relative">
+    <div className="min-h-dvh bg-zinc-950 p-4 md:p-6 relative overflow-hidden">
       {/* Faulty Terminal Background */}
       <FaultyTerminal 
         tint="#22c55e"
         glitchAmount={0.3}
         scanlineIntensity={0.5}
         mouseReact={true}
+      />
+      
+      {/* Particle Field for ambient effects */}
+      <ParticleField 
+        particleCount={30}
+        color="#22c55e"
+        className="opacity-30"
       />
 
       {/* Demo Mode Badge */}
@@ -238,20 +251,30 @@ export default function Dashboard() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="mt-1 text-pretty text-sm text-zinc-500"
+              className="mt-2 text-pretty text-sm text-zinc-500"
             >
-              Agent reputation ledger on Solana
+              <ShimmerText text="Agent Reputation Ledger on Solana" speed={4} />
             </motion.p>
           </div>
           <div className="flex items-center gap-2 text-xs">
-            <span className="inline-flex h-5 items-center gap-1 rounded-full bg-zinc-800/80 border border-zinc-700/50 px-2 py-0.5 text-zinc-400 backdrop-blur-sm">
+            <motion.span 
+              className="inline-flex h-5 items-center gap-1 rounded-full bg-zinc-800/80 border border-zinc-700/50 px-3 py-0.5 text-zinc-400 backdrop-blur-sm"
+              whileHover={{ scale: 1.05 }}
+            >
               <motion.span 
                 className="h-1.5 w-1.5 rounded-full bg-green-400"
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
-              x402 Enabled
-            </span>
+              <span className="relative">
+                <span className="relative z-10">x402 Enabled</span>
+                <motion.span
+                  className="absolute inset-0 z-0 bg-gradient-to-r from-green-400/20 to-transparent opacity-0"
+                  whileHover={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                />
+              </span>
+            </motion.span>
           </div>
         </div>
       </header>
@@ -276,7 +299,11 @@ export default function Dashboard() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="mb-3 w-full rounded-lg border border-zinc-700/50 bg-zinc-900/80 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 backdrop-blur-sm"
           />
-          <div className="space-y-1">
+          <AnimatedList
+            animation="slide"
+            staggerDelay={0.05}
+            className="space-y-1"
+          >
             {filteredAgents.map((agent, index) => (
               <AgentCard
                 key={agent.id}
@@ -286,7 +313,7 @@ export default function Dashboard() {
                 index={index}
               />
             ))}
-          </div>
+          </AnimatedList>
         </section>
 
         {/* Details */}
@@ -298,24 +325,26 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-zinc-700 text-lg font-medium">
-                {selectedAgent.name.charAt(0)}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <DecryptedText 
-                      text={selectedAgent.name}
-                      speed={50}
-                      className="text-lg font-medium text-zinc-100"
-                    />
-                    <p className="text-xs text-zinc-500">{selectedAgent.tags.join(', ')}</p>
+            <SpotlightCard color="#22c55e" intensity={0.3} className="h-full rounded-xl p-5 -m-px border border-zinc-200/10 bg-zinc-900/50">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-zinc-700 text-lg font-medium">
+                  {selectedAgent.name.charAt(0)}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <DecryptedText 
+                        text={selectedAgent.name}
+                        speed={50}
+                        className="text-lg font-medium text-zinc-100"
+                      />
+                      <p className="text-xs text-zinc-500">{selectedAgent.tags.join(', ')}</p>
+                    </div>
+                    <TrustScoreRing score={selectedAgent.score} />
                   </div>
-                  <TrustScoreRing score={selectedAgent.score} />
                 </div>
               </div>
-            </div>
+            </SpotlightCard>
           </motion.div>
 
           {/* Score Breakdown */}
@@ -325,27 +354,29 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <h3 className="mb-3 text-sm font-medium text-zinc-400">Score Breakdown</h3>
-            <div className="space-y-3">
-              {mockScoreBreakdown.map((item, i) => (
-                <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 + i * 0.1 }}
-                >
-                  <div className="mb-1 flex justify-between text-xs">
-                    <span className="text-zinc-400">{item.label}</span>
-                    <CountUp 
-                      end={item.value} 
-                      duration={1}
-                      className="text-zinc-300 tabular-nums"
-                    />
-                  </div>
-                  <ProgressBar value={item.value} />
-                </motion.div>
-              ))}
-            </div>
+            <SpotlightCard color="#22c55e" intensity={0.2} className="h-full rounded-xl p-5 -m-px border border-zinc-200/10 bg-zinc-900/50">
+              <h3 className="mb-3 text-sm font-medium text-zinc-400">Score Breakdown</h3>
+              <div className="space-y-3">
+                {mockScoreBreakdown.map((item, i) => (
+                  <motion.div
+                    key={item.label}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 + i * 0.1 }}
+                  >
+                    <div className="mb-1 flex justify-between text-xs">
+                      <span className="text-zinc-400">{item.label}</span>
+                      <CountUp 
+                        end={item.value} 
+                        duration={1}
+                        className="text-zinc-300 tabular-nums"
+                      />
+                    </div>
+                    <ProgressBar value={item.value} />
+                  </motion.div>
+                ))}
+              </div>
+            </SpotlightCard>
           </motion.div>
 
           {/* Attestations */}
@@ -355,36 +386,38 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <h3 className="mb-3 text-sm font-medium text-zinc-400">Recent Attestations</h3>
-            <div className="space-y-2">
-              {mockAttestations.map((att, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 + i * 0.03 }}
-                  className="flex items-center justify-between rounded-lg bg-zinc-900/50 p-3"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">{att.icon}</span>
-                    <div>
-                      <DecryptedText 
-                        text={att.source}
-                        speed={30}
-                        className="text-sm text-zinc-200"
-                      />
-                      <p className="text-xs text-zinc-500">{att.type}</p>
+            <SpotlightCard color="#22c55e" intensity={0.2} className="h-full rounded-xl p-5 -m-px border border-zinc-200/10 bg-zinc-900/50">
+              <h3 className="mb-3 text-sm font-medium text-zinc-400">Recent Attestations</h3>
+              <div className="space-y-2">
+                {mockAttestations.map((att, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 + i * 0.03 }}
+                    className="flex items-center justify-between rounded-lg bg-zinc-900/50 p-3"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{att.icon}</span>
+                      <div>
+                        <DecryptedText 
+                          text={att.source}
+                          speed={30}
+                          className="text-sm text-zinc-200"
+                        />
+                        <p className="text-xs text-zinc-500">{att.type}</p>
+                      </div>
                     </div>
-                  </div>
-                  <CountUp 
-                    end={att.value} 
-                    duration={0.8}
-                    prefix="+"
-                    className="text-sm font-medium text-green-400 tabular-nums"
-                  />
-                </motion.div>
-              ))}
-            </div>
+                    <CountUp 
+                      end={att.value} 
+                      duration={0.8}
+                      prefix="+"
+                      className="text-sm font-medium text-green-400 tabular-nums"
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            </SpotlightCard>
           </motion.div>
         </section>
       </div>

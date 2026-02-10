@@ -4,6 +4,10 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'ShadowTrust - Agent Reputation Ledger',
   description: 'Unified reputation layer for autonomous agents on Solana',
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({
