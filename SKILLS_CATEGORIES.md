@@ -84,13 +84,14 @@
 
 ---
 
-## 4. 🤖 AI & Agents (8 skills)
+## 4. 🤖 AI & Agents (9 skills)
 *Building autonomous agents, Claude Code integration*
 
 | Skill | Purpose |
 |-------|---------|
 | agent-browser | Headless browser |
 | agent-development | Agent structure |
+| agent-lightning | Agent training with RL/RLHF |
 | agent-md-refactor | Agent docs refactoring |
 | brainstorm-ideas | Creative ideation |
 | find-skills | Skill discovery |
@@ -281,7 +282,7 @@
 | 🎨 Frontend & UI | 28 | Building web interfaces |
 | ⚡ Backend & APIs | 12 | Server-side, databases |
 | 🪙 Blockchain & Web3 | 12 | Crypto, onchain ops |
-| 🤖 AI & Agents | 8 | Autonomous agents |
+| 🤖 AI & Agents | 9 | Autonomous agents |
 | 🛠️ DevOps & Tooling | 22 | Workflow, debugging |
 | 📝 Communication | 15 | Writing, docs, updates |
 | 🔍 Research & Analysis | 10 | Search, data, intel |
