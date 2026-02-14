@@ -1,102 +1,92 @@
 ---
 name: Agent Browser
-description: A fast Rust-based headless browser automation CLI with Node.js fallback that enables AI agents to navigate, click, type, and snapshot pages via structured commands.
-read_when:
-  - Automating web interactions
-  - Extracting structured data from pages
-  - Filling forms programmatically
-  - Testing web UIs
+description: Fast headless browser automation. For OpenClaw: use exec tool. For Claude Code/Cursor: use MCP server.
 metadata: {"openclaw": {"requires": {"bins": ["agent-browser"]}, "install": [{"id": "npm", "kind": "npm", "package": "agent-browser", "bins": ["agent-browser"]}]}}
 ---
 
-# Browser Automation with agent-browser
+# Browser Automation
 
-## Installation
+**For OpenClaw:** Use `exec` tool with `agent-browser` CLI  
+**For Claude Code/Cursor:** Use MCP server (配置 in `.mcp.json`)
 
-```bash
-npm install -g agent-browser
-agent-browser install
-```
-
-## MCP Server Configuration
-
-### Claude Code / Cursor (`.mcp.json`)
-
-```json
-{
-  "mcpServers": {
-    "agent-browser": {
-      "command": "npx",
-      "args": ["-y", "agent-browser"]
-    }
-  }
-}
-```
-
-### OpenClaw
-
-agent-browser is installed globally. Use via exec tool:
+## OpenClaw Usage (exec tool)
 
 ```bash
-agent-browser open <url>
-agent-browser snapshot -i
-agent-browser click @e1
-```
+# Navigate to URL
+exec(agent-browser open https://example.com)
 
-### VS Code / Codex
+# Get interactive elements with refs
+exec(agent-browser snapshot -i)
 
-Add to `.vscode/mcp.json` or `~/.codex/config.toml`:
+# Click element by ref
+exec(agent-browser click @e1)
 
-```json
-{
-  "mcpServers": {
-    "agent-browser": {
-      "command": "npx",
-      "args": ["-y", "agent-browser"]
-    }
-  }
-}
-```
+# Fill input
+exec(agent-browser fill @e2 "text")
 
-## Quick Start (CLI)
+# Take screenshot
+exec(agent-browser screenshot ./page.png)
 
-```bash
-agent-browser open <url>        # Navigate to page
-agent-browser snapshot -i       # Get interactive elements with refs
-agent-browser click @e1         # Click element by ref
-agent-browser fill @e2 "text"  # Fill input by ref
-agent-browser close             # Close browser
+# Close browser
+exec(agent-browser close)
 ```
 
 ## Core Commands
 
 | Command | Description |
 |---------|-------------|
-| `open <url>` | Navigate to URL |
-| `snapshot -i` | Get interactive elements with @refs |
-| `click @e1` | Click element by ref |
-| `fill @e2 "text"` | Fill input field |
-| `type @e2 "text"` | Type without clearing |
-| `screenshot` | Take screenshot |
-| `close` | Close browser |
+| `agent-browser open <url>` | Navigate to URL |
+| `agent-browser snapshot -i` | Get interactive elements (recommended) |
+| `agent-browser click @e1` | Click element by ref |
+| `agent-browser fill @e2 "text"` | Fill input field |
+| `agent-browser type @e2 "text"` | Type without clearing |
+| `agent-browser screenshot` | Take screenshot |
+| `agent-browser scroll down 500` | Scroll page |
+| `agent-browser close` | Close browser |
 
-## Example: Form Submission
+## Example Workflow
 
-```bash
-agent-browser open https://example.com/form
-agent-browser snapshot -i
-# Output: textbox "Email" [ref=e1], textbox "Password" [ref=e2], button "Submit" [ref=e3]
+```typescript
+// In your OpenClaw session:
 
-agent-browser fill @e1 "user@example.com"
-agent-browser fill @e2 "password123"
-agent-browser click @e3
-agent-browser wait --load networkidle
-agent-browser snapshot -i  # Check result
+// 1. Navigate to page
+await exec({command: "agent-browser open https://example.com/form", timeout: 30});
+
+// 2. Get interactive elements
+const snapshot = await exec({command: "agent-browser snapshot -i", timeout: 30});
+// Output shows: textbox [ref=e1], textbox [ref=e2], button [ref=e3]
+
+// 3. Fill form
+await exec({command: 'agent-browser fill @e1 "user@example.com"', timeout: 10});
+await exec({command: 'agent-browser fill @e2 "password123"', timeout: 10});
+
+// 4. Submit
+await exec({command: "agent-browser click @e3", timeout: 10});
+
+// 5. Wait for navigation
+await exec({command: "agent-browser wait --load networkidle", timeout: 30});
+
+// 6. Screenshot
+await exec({command: "agent-browser screenshot ./result.png", timeout: 30});
 ```
 
-## MCP Tools Available
+## For Claude Code / Cursor (MCP)
 
-When configured as MCP server:
+Add to `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "agent-browser": {
+      "command": "npx",
+      "args": ["-y", "agent-browser"]
+    }
+  }
+}
+```
+
+## MCP Tools Available (Claude Code/Cursor)
+
 - `navigate` - Go to URL
 - `click` - Click element
 - `type` - Type text
@@ -105,9 +95,15 @@ When configured as MCP server:
 - `scroll` - Scroll page
 - `close` - Close browser
 
-## Troubleshooting
+## Example Prompts (Claude Code with MCP)
 
-- If command not found, use full path: `/home/linuxbrew/.linuxbrew/bin/agent-browser`
-- Always snapshot after navigation for new refs
-- Use `--headed` to see browser window for debugging
-- Check refs are stable per page load
+- "Navigate to https://example.com"
+- "Take a screenshot"
+- "Fill the login form"
+- "Click the submit button"
+
+## Skills Reference
+
+- Use `web-design-guidelines` for web design best practices
+- Use `accessibility` for a11y compliance
+- Use `fixing-accessibility` for a11y fixes

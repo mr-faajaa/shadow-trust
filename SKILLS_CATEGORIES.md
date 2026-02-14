@@ -244,7 +244,21 @@
 
 ---
 
-## 12. 📦 Integration Skills (8 skills)
+## 12. 🔌 MCP Servers (6 skills)
+*Model Context Protocol servers for enhanced capabilities*
+
+| Skill | Purpose |
+|-------|---------|
+| mcp-integration | MCP integration guide |
+| mcp-builder | Build custom MCP servers |
+| shadcn-mcp | Browse/install shadcn/ui components |
+| react-bits-mcp | Access React Bits animations |
+| agent-browser | Browser automation MCP |
+| openapi-to-typescript | OpenAPI MCP support |
+
+---
+
+## 13. 📦 Integration Skills (8 skills)
 *Vercel, Claude migration, misc*
 
 | Skill | Purpose |
@@ -274,5 +288,6 @@
 | 🎬 Media & Presentation | 10 | Videos, slides, GIFs |
 | 📋 Project Management | 10 | Planning, requirements |
 | ✅ Code Quality | 10 | Reviews, testing |
-| 🔧 Specialized Tech | 8 | SQL, PDF, architecture |
+| 🔧 Specialized Tech | 10 | SQL, PDF, architecture |
+| 🔌 MCP Servers | 6 | MCP server configs |
 | 📦 Integrations | 8 | Vercel, migrations |

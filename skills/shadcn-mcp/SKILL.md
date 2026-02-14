@@ -1,63 +1,78 @@
 ---
 name: shadcn-mcp
-description: MCP server for shadcn/ui components registry - browse, search, and install components
+description: Browse and install shadcn/ui components. For OpenClaw: use exec tool to run shadcn commands directly.
 metadata: {"openclaw": {"requires": {"bins": ["npx", "shadcn"]}, "install": [{"id": "npm", "kind": "npm", "package": "shadcn@latest", "bins": ["shadcn"]}]}}
 ---
 
-# shadcn MCP Server
+# shadcn/ui Components for OpenClaw
 
-MCP server for browsing and installing shadcn/ui components using natural language.
+**Note:** OpenClaw doesn't have native MCP support. Use `exec` tool to run shadcn commands directly.
 
-## What It Does
+## OpenClaw Usage (exec tool)
 
-- Browse components, blocks, and templates from any configured registry
-- Search across registries for specific functionality
-- Install components using natural language prompts
-- Support for multiple registries (shadcn/ui, private, third-party)
+```bash
+# Initialize shadcn in a project
+exec(cd /path/to/project && npx shadcn@latest init)
+
+# Add components
+exec(npx shadcn@latest add button dialog card)
+
+# List available components
+exec(npx shadcn@latest list)
+
+# Check version
+exec(npx shadcn@latest --version)
+```
+
+## Example Workflow
+
+```typescript
+// In your OpenClaw session:
+
+// 1. Initialize in project
+await exec({command: "cd /home/ubuntu/projects/my-app && npx shadcn@latest init", timeout: 60});
+
+// 2. Add components
+await exec({command: "cd /home/ubuntu/projects/my-app && npx shadcn@latest add button input card", timeout: 60});
+
+// 3. Check what components are available
+await exec({command: "npx shadcn@latest list", timeout: 30});
+```
 
 ## Installation
 
 ```bash
-npx shadcn@latest init
-npx shadcn@latest add button dialog card
-```
-
-Or install globally:
-```bash
+# Global install
 npm install -g shadcn-ui
+
+# Or use npx (recommended)
+npx shadcn@latest <command>
 ```
 
-## MCP Configuration
+## Common Commands
 
-### OpenClaw
+| Command | Description |
+|---------|-------------|
+| `npx shadcn@latest init` | Initialize shadcn |
+| `npx shadcn@latest add <component>` | Add component |
+| `npx shadcn@latest list` | List all components |
+| `npx shadcn@latest remove <component>` | Remove component |
+| `npx shadcn@latest upgrade` | Upgrade components |
 
-Add to `~/.openclaw/openclaw.json`:
+## Component Registry
 
-```json
-{
-  "plugins": {
-    "entries": {
-      "shadcn-mcp": {
-        "enabled": true
-      }
-    }
-  },
-  "skills": {
-    "entries": {
-      "shadcn-mcp": {
-        "enabled": true,
-        "env": {
-          "SHADCN_REGISTRY": "https://ui.shadcn.com/registry"
-        }
-      }
-    }
-  }
-}
-```
+Default registry: `https://ui.shadcn.com/registry`
 
-### Claude Code
+### Popular Components
 
-Add to `.mcp.json` in your project:
+- button, input, card, dialog, dropdown-menu
+- form, select, tabs, toast, tooltip
+- accordion, alert, avatar, calendar, chart
+- data-table, date-picker, navigation-menu
+
+## For Claude Code / Cursor (Native MCP)
+
+If using Claude Code or Cursor, add to `.mcp.json`:
 
 ```json
 {
@@ -70,106 +85,14 @@ Add to `.mcp.json` in your project:
 }
 ```
 
-### Cursor
+## Example Prompts (Claude Code with MCP)
 
-Add to `.cursor/mcp.json`:
+- "Show me all available shadcn components"
+- "Add a button and dialog to my project"
+- "Find a data table component"
 
-```json
-{
-  "mcpServers": {
-    "shadcn": {
-      "command": "npx",
-      "args": ["shadcn@latest", "mcp"]
-    }
-  }
-}
-```
+## Skills Reference
 
-### VS Code (GitHub Copilot)
-
-Add to `.vscode/mcp.json`:
-
-```json
-{
-  "servers": {
-    "shadcn": {
-      "command": "npx",
-      "args": ["shadcn@latest", "mcp"]
-    }
-  }
-}
-```
-
-### Codex
-
-Add to `~/.codex/config.toml`:
-
-```toml
-[mcp_servers.shadcn]
-command = "npx"
-args = ["shadcn@latest", "mcp"]
-```
-
-## Example Prompts
-
-### Browse & Search
-- "Show me all available components in the shadcn registry"
-- "Find me a login form from the shadcn registry"
-- "What components are available for dialogs?"
-
-### Install Items
-- "Add the button component to my project"
-- "Create a login form using shadcn components"
-- "Install dialog and card components"
-
-### Multiple Registries
-- "Show me components from acme registry"
-- "Install @internal/auth-form"
-
-## Supported Registries
-
-- **shadcn/ui** - Default registry
-- **Third-Party** - Any shadcn-compatible registry
-- **Private** - Your company's internal component library
-- **Namespaced** - Multiple registries with @namespace syntax
-
-## Configure Additional Registries
-
-Add to `components.json`:
-
-```json
-{
-  "registries": {
-    "@acme": "https://registry.acme.com/{name}.json",
-    "@internal": {
-      "url": "https://internal.company.com/{name}.json",
-      "headers": {
-        "Authorization": "Bearer ${REGISTRY_TOKEN}"
-      }
-    }
-  }
-}
-```
-
-## Environment Variables
-
-For private registries:
-
-```bash
-REGISTRY_TOKEN=your_token_here
-API_KEY=your_api_key_here
-```
-
-## Troubleshooting
-
-### MCP Not Responding
-1. Check configuration is correct
-2. Restart your MCP client
-3. Verify shadcn is installed
-4. Check network access to registries
-
-### Installation Failures
-1. Verify components.json exists
-2. Check target directories exist
-3. Ensure write permissions
-4. Review dependencies
+- Use `ui-skills` for UI design constraints
+- Use `baseline-ui` for UI patterns
+- Use `tailwindcss` for styling
