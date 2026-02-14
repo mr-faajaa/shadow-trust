@@ -294,3 +294,69 @@ The goal: Be helpful without being annoying. Check in a few times a day, do usef
 ## Make It Yours
 
 This is a starting point. Add your own conventions, style, and rules as you figure out what works.
+
+---
+
+## 🎯 Skills Workflow (CRITICAL)
+
+Before installing ANY skill, ALWAYS follow this workflow:
+
+### Step 1: Check OpenClaw Docs FIRST
+```bash
+# BEFORE anything else
+openclaw docs skills
+# or visit: https://docs.openclaw.ai/tools/skills
+```
+
+### Step 2: Find Skills
+```bash
+clawhub search <keyword>
+```
+
+### Step 3: Security Audit (REQUIRED)
+**Scan unfamiliar skills before installing:**
+
+```bash
+curl --request POST \
+  --url "https://ai.gendigital.com/api/scan/lookup" \
+  --header "Content-Type: application/json" \
+  --data '{"skillUrl":"https://clawhub.ai/author/skill-name"}'
+```
+
+**Always:**
+- Read SKILL.md before enabling
+- Look for suspicious code (`curl | bash`, hidden commands)
+- Check for hardcoded secrets/API keys
+- Verify author is trusted
+
+### Step 4: Install
+```bash
+# Install to workspace (highest precedence)
+clawhub install <skill-name>
+```
+
+### Step 5: Verify
+```bash
+ls /skills | grep <skill-name>
+cat /skills/<skill-name>/SKILL.md
+```
+
+### Skills Locations (Precedence)
+| Path | Precedence |
+|------|------------|
+| `/skills` → workspace/skills | **HIGHEST** |
+| `~/.openclaw/skills` | MEDIUM |
+| Bundled (npm) | LOWEST |
+
+### Common Mistakes (DON'T DO THESE)
+- ❌ Install without reading SKILL.md
+- ❌ Skip security audit
+- ❌ Guess structure instead of checking docs
+- ❌ Ignore `/skills` symlink requirement
+- ❌ Trust unknown sources
+
+### Quick Reference
+- **Docs:** https://docs.openclaw.ai/tools/skills
+- **ClawHub:** https://clawhub.com
+- **Security:** https://ai.gendigital.com
+- **Guide:** `SKILLS_OPERATIONS_GUIDE.md`
