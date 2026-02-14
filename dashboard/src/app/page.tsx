@@ -60,7 +60,7 @@ function StatCard({
       <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">{label}</p>
       {isNumber && typeof value === 'number' ? (
         <p className="mt-2 text-2xl font-semibold text-zinc-100 tabular-nums">
-          <CountUp end={value} duration={1.5} />
+          <CountUp to={value} duration={1.5} />
         </p>
       ) : (
         <p className="mt-2 text-2xl font-semibold text-zinc-100">{value}</p>
@@ -124,7 +124,7 @@ function AgentCard({
           </div>
           <div className="flex items-center gap-1">
             <CountUp 
-              end={agent.score} 
+              to={agent.score} 
               duration={1.2}
               className={cn(
                 'text-sm font-semibold tabular-nums',
@@ -186,7 +186,7 @@ function TrustScoreRing({ score }: { score: number }) {
         />
       </svg>
       <div className={cn('absolute text-lg font-semibold tabular-nums', color)}>
-        <CountUp end={score} duration={1} />
+        <CountUp to={score} duration={1} />
       </div>
     </div>
   )
@@ -375,7 +375,7 @@ export default function Dashboard() {
                     <div className="mb-1 flex justify-between text-xs">
                       <span className="text-zinc-400">{item.label}</span>
                       <CountUp 
-                        end={item.value} 
+                        to={item.value} 
                         duration={1}
                         className="text-zinc-300 tabular-nums"
                       />
@@ -419,12 +419,12 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <CountUp 
-                      end={att.value} 
+                      to={att.value} 
                       duration={0.8}
-                      prefix="+"
                       className="text-sm font-medium text-green-400 tabular-nums"
                       aria-label={`Score value ${att.value}`}
                     />
+                    <span className="text-sm font-medium text-green-400">+</span>
                   </motion.div>
                 ))}
               </div>

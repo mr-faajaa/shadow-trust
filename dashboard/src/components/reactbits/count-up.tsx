@@ -1,82 +1,115 @@
-'use client';
+import { useInView, useMotionValue, useSpring } from 'motion/react';
+import { useCallback, useEffect, useRef } from 'react';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, useSpring, useTransform, SpringOptions } from 'motion/react';
-
-export interface CountUpProps {
-  end: number;
+interface CountUpProps {
+  to: number;
+  from?: number;
+  direction?: 'up' | 'down';
+  delay?: number;
   duration?: number;
-  start?: number;
-  decimals?: number;
-  prefix?: string;
-  suffix?: string;
   className?: string;
-  springOptions?: SpringOptions;
-  onComplete?: () => void;
+  startWhen?: boolean;
+  separator?: string;
+  onStart?: () => void;
+  onEnd?: () => void;
 }
 
-export function CountUp({
-  end,
-  duration = 1.5,
-  start = 0,
-  decimals = 0,
-  prefix = '',
-  suffix = '',
+export default function CountUp({
+  to,
+  from = 0,
+  direction = 'up',
+  delay = 0,
+  duration = 2,
   className = '',
-  springOptions = { bounce: 0, damping: 20, stiffness: 100 },
-  onComplete
+  startWhen = true,
+  separator = '',
+  onStart,
+  onEnd
 }: CountUpProps) {
-  const [displayValue, setDisplayValue] = useState(start);
-  const [isComplete, setIsComplete] = useState(false);
-  const hasCompleted = useRef(false);
-  
-  // Use spring for smooth animation
-  const spring = useSpring(start, springOptions);
-  const rounded = useTransform(spring, (latest: number) => {
-    const value = decimals > 0 ? latest.toFixed(decimals) : Math.round(latest).toString();
-    return value;
+  const ref = useRef<HTMLSpanElement>(null);
+  const motionValue = useMotionValue(direction === 'down' ? to : from);
+
+  const damping = 20 + 40 * (1 / duration);
+  const stiffness = 100 * (1 / duration);
+
+  const springValue = useSpring(motionValue, {
+    damping,
+    stiffness
   });
 
+  const isInView = useInView(ref, { once: true, margin: '0px' });
+
+  const getDecimalPlaces = (num: number): number => {
+    const str = num.toString();
+    if (str.includes('.')) {
+      const decimals = str.split('.')[1];
+      if (parseInt(decimals) !== 0) {
+        return decimals.length;
+      }
+    }
+    return 0;
+  };
+
+  const maxDecimals = Math.max(getDecimalPlaces(from), getDecimalPlaces(to));
+
+  const formatValue = useCallback(
+    (latest: number) => {
+      const hasDecimals = maxDecimals > 0;
+
+      const options: Intl.NumberFormatOptions = {
+        useGrouping: !!separator,
+        minimumFractionDigits: hasDecimals ? maxDecimals : 0,
+        maximumFractionDigits: hasDecimals ? maxDecimals : 0
+      };
+
+      const formattedNumber = Intl.NumberFormat('en-US', options).format(latest);
+
+      return separator ? formattedNumber.replace(/,/g, separator) : formattedNumber;
+    },
+    [maxDecimals, separator]
+  );
+
   useEffect(() => {
-    const unsubscribe = spring.on('change', (latest: number) => {
-      if (!hasCompleted.current) {
-        setDisplayValue(latest);
-        
-        // Check if we've reached the target
-        if (latest >= end && end >= start) {
-          hasCompleted.current = true;
-          setIsComplete(true);
-          onComplete?.();
-        } else if (latest <= end && end <= start) {
-          hasCompleted.current = true;
-          setIsComplete(true);
-          onComplete?.();
-        }
+    if (ref.current) {
+      ref.current.textContent = formatValue(direction === 'down' ? to : from);
+    }
+  }, [from, to, direction, formatValue]);
+
+  useEffect(() => {
+    if (isInView && startWhen) {
+      if (typeof onStart === 'function') {
+        onStart();
+      }
+
+      const timeoutId = setTimeout(() => {
+        motionValue.set(direction === 'down' ? from : to);
+      }, delay * 1000);
+
+      const durationTimeoutId = setTimeout(
+        () => {
+          if (typeof onEnd === 'function') {
+            onEnd();
+          }
+        },
+        delay * 1000 + duration * 1000
+      );
+
+      return () => {
+        clearTimeout(timeoutId);
+        clearTimeout(durationTimeoutId);
+      };
+    }
+  }, [isInView, startWhen, motionValue, direction, from, to, delay, onStart, onEnd, duration]);
+
+  useEffect(() => {
+    const unsubscribe = springValue.on('change', (latest: number) => {
+      if (ref.current) {
+        ref.current.textContent = formatValue(latest);
       }
     });
 
-    // Animate to end value
-    spring.set(end);
+    return () => unsubscribe();
+  }, [springValue, formatValue]);
 
-    return () => {
-      unsubscribe();
-    };
-  }, [spring, end, start, onComplete]);
-
-  // Format with decimals
-  const formatValue = (val: number) => {
-    const formatted = decimals > 0 ? val.toFixed(decimals) : Math.round(val).toString();
-    return `${prefix}${formatted}${suffix}`;
-  };
-
-  return (
-    <motion.span
-      className={className}
-      data-complete={isComplete}
-    >
-      {formatValue(displayValue)}
-    </motion.span>
-  );
+  return <span className={className} ref={ref} />;
 }
-
-export default CountUp;
