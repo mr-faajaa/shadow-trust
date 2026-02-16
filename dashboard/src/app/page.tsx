@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'motion/react'
 import { cn } from '@/lib/utils'
-import { DecryptedText, CountUp, FaultyTerminal, GlitchText, RollingNumber, AnimatedList, SpotlightCard, Skeleton, ParticleField, ShimmerText } from '@/components/reactbits'
+import { DecryptedText, CountUp, FaultyTerminal, GlitchText, RollingNumber, AnimatedList, SpotlightCard, Skeleton, ParticleField, ShimmerText, Flip, TiltCard, GlassSurface, GradientText, Waves, CardSwap, Counter, BounceCards, Marquee, ShinyButton } from '@/components/reactbits'
 
 type Trend = 'up' | 'stable' | 'down'
 type AgentData = {
@@ -224,6 +224,14 @@ export default function Dashboard() {
         mouseReact={true}
       />
       
+      {/* Waves Background */}
+      <Waves 
+        color="#22c55e"
+        amplitude={40}
+        speed={0.3}
+        className="opacity-20"
+      />
+      
       {/* Particle Field for ambient effects */}
       <ParticleField 
         particleCount={30}
@@ -260,7 +268,7 @@ export default function Dashboard() {
               transition={{ delay: 0.5 }}
               className="mt-2 text-pretty text-sm text-zinc-500"
             >
-              <ShimmerText text="Agent Reputation Ledger on Solana" speed={4} />
+              <GradientText text="Agent Reputation Ledger on Solana" gradient="from-green-400 via-emerald-400 to-teal-400" animated={true} />
             </motion.p>
           </div>
           <div className="flex items-center gap-2 text-xs">
@@ -287,12 +295,14 @@ export default function Dashboard() {
       </header>
 
       {/* Stats */}
-      <div className="mb-6 grid max-w-6xl grid-cols-2 gap-2 sm:grid-cols-4 relative z-10">
-        <StatCard label="Agents" value={mockAgents.length} delay={0} isNumber />
-        <StatCard label="Avg Trust" value={avgTrust} delay={0.05} isNumber />
-        <StatCard label="Attestations" value={totalAttestations} delay={0.1} isNumber />
-        <StatCard label="Integrations" value={3} delay={0.15} />
-      </div>
+      <GlassSurface intensity="medium" blur={10} className="mb-6 p-1">
+        <div className="grid max-w-6xl grid-cols-2 gap-2 sm:grid-cols-4 relative z-10">
+          <StatCard label="Agents" value={mockAgents.length} delay={0} isNumber />
+          <StatCard label="Avg Trust" value={avgTrust} delay={0.05} isNumber />
+          <StatCard label="Attestations" value={totalAttestations} delay={0.1} isNumber />
+          <StatCard label="Integrations" value={3} delay={0.15} />
+        </div>
+      </GlassSurface>
 
       {/* Main */}
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 lg:grid-cols-3 relative z-10">

@@ -4,3 +4,4 @@ export { default as CountUp } from './count-up';
 export { default as GlitchText } from './glitch-text';
 export { default as RollingNumber } from './rolling-number';
 export { AnimatedList, SpotlightCard, Skeleton, Magnetic, ParticleField, ShimmerText } from './enhanced-components';
+export { Flip, TiltCard, GlassSurface, GradientText, Waves, CardSwap, Counter, BounceCards, Marquee, ShinyButton } from './flip';
