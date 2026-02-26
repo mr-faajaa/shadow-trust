@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""Solscan CLI - Quick lookup tool for Solana transactions and addresses."""
+import sys
+import os
+import json
+
+# Add src to path
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+WORKSPACE_DIR = os.path.dirname(SCRIPT_DIR)  # go up from bin/
+sys.path.insert(0, os.path.join(WORKSPACE_DIR, 'free-solscan-api', 'src'))
+
+import free_solscan_api
+
+router = free_solscan_api.Router(free_solscan_api.solscan_endpoints)
+
+def tx(tx_hash):
+    """Get transaction details."""
+    result = router.transaction(tx_hash)
+    print(json.dumps(result, indent=2))
+    return result
+
+def account(address):
+    """Get account info."""
+    result = router.account_info(address)
+    print(json.dumps(result, indent=2))
+    return result
+
+def transfers(address, page=1):
+    """Get transfers for an address."""
+    result = router.transfers(address, page=page)
+    print(json.dumps(result, indent=2))
+    return result
+
+def tokens(address):
+    """Get token holdings for an address."""
+    result = router.portfolio(address, type="token", page=1, page_size=100)
+    print(json.dumps(result, indent=2))
+    return result
+
+def holders(token_address, page=1):
+    """Get token holders."""
+    result = router.token_holders(token_address, page=page, page_size=100)
+    print(json.dumps(result, indent=2))
+    return result
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: solscan <command> [args]")
+        print("Commands:")
+        print("  tx <tx_hash>              - Get transaction details")
+        print("  account <address>         - Get account info")
+        print("  transfers <address>       - Get transfers")
+        print("  tokens <address>          - Get token holdings")
+        print("  holders <token_address>    - Get token holders")
+        sys.exit(1)
+    
+    cmd = sys.argv[1]
+    
+    if cmd == "tx" and len(sys.argv) >= 3:
+        tx(sys.argv[2])
+    elif cmd == "account" and len(sys.argv) >= 3:
+        account(sys.argv[2])
+    elif cmd == "transfers" and len(sys.argv) >= 3:
+        transfers(sys.argv[2])
+    elif cmd == "tokens" and len(sys.argv) >= 3:
+        tokens(sys.argv[2])
+    elif cmd == "holders" and len(sys.argv) >= 3:
+        holders(sys.argv[2])
+    else:
+        print(f"Unknown command: {cmd}")
+        main()
+
+if __name__ == "__main__":
+    main()
