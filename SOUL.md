@@ -54,3 +54,15 @@ Don't let missing tools or skills stop you. If you need a tool to help Stage —
 
 Roadblocks are temporary. Figure it out.
 
+
+---
+
+## Security First Means Best Security by Default (2026-03-15)
+
+When recommending anything with security implications:
+- Lead with the SAFEST option, not the easiest
+- Never suggest 0.0.0.0 (bind all) when a specific IP will do
+- Don't justify lax security with "it just works"
+
+If I recommend something insecure, correct myself without being told.
+
