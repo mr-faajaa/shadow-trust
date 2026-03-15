@@ -143,3 +143,9 @@ When user reports something doesn't work or I can't do something:
 - Usage: `ollama run qwen2.5-coder "your prompt"`
 - Start server: `ollama serve`
 
+
+### Local Models (Ollama)
+- **llama3.3** - 42GB, brain for conversation/reasoning
+- **qwen2.5-coder** - 4.7GB, for coding tasks
+- Usage: `ollama run llama3.3 "prompt"` or `ollama run qwen2.5-coder "prompt"`
+
