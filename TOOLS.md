@@ -117,3 +117,14 @@ When user reports something doesn't work or I can't do something:
 3. Update TOOLS.md and MEMORY.md to record the fix
 4. Don't make user repeat themselves
 
+
+### Remote Browser (Brave via Tailscale)
+- **URL:** http://100.80.156.2:9222
+- **User:** prestage (Windows machine)
+- **Setup:** Brave runs with --remote-debugging-port=9222, Tailscale serves it
+- **Usage:** 
+  ```bash
+  BROWSER_USE_DEBUGGER_URL=http://100.80.156.2:9222 browser-use --browser real <command>
+  ```
+- **To enable:** Run Brave with debug flag + tailscale serve --tcp 9222 localhost:9222
+
