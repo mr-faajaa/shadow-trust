@@ -128,3 +128,12 @@ When user reports something doesn't work or I can't do something:
   ```
 - **To enable:** Run Brave with debug flag + tailscale serve --tcp 9222 localhost:9222
 
+
+### Agent Browser (via agent-browser CLI)
+- **Connection:** `--cdp http://100.80.156.2:9222`
+- **Commands:**
+  - `agent-browser --cdp http://100.80.156.2:9222 tab list` - list all tabs
+  - `agent-browser --cdp http://100.80.156.2:9222 tab <n>` - switch to tab
+  - `agent-browser --cdp http://100.80.156.2:9222 screenshot` - take screenshot
+  - `agent-browser --cdp http://100.80.156.2:9222 snapshot` - get page structure
+
