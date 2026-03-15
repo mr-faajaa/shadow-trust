@@ -95,3 +95,25 @@ Things like:
 - Pubkey: 0371634d8e89d298b560e2efc583f094cc4966f9e9ecd987c23497e9166a5d2483
 
 Add whatever helps you do your job. This is your cheat sheet.
+
+### Image Viewing (OCR)
+- **tesseract-ocr**: Read text from screenshots/images
+- **pillow**: Python image processing
+- **Usage:**
+  ```bash
+  tesseract /path/to/image.png stdout
+  ```
+- **Why**: Can read screenshots users send, terminal output, etc.
+- **Installed**: 2026-03-15 (was unable to view images initially, fixed after user pushed)
+
+
+---
+
+## Self-Improvement Rules
+
+When user reports something doesn't work or I can't do something:
+1. FIX IT FIRST, ask questions later
+2. Install missing tools proactively
+3. Update TOOLS.md and MEMORY.md to record the fix
+4. Don't make user repeat themselves
+

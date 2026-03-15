@@ -1,5 +1,14 @@
 # MEMORY.md - Long-Term Memory
 
+## Solscan CLI Tool (Learned: 2026-02-26)
+
+Added free Solscan API CLI for on-chain data:
+- CLI at `/home/ubuntu/.openclaw/workspace/bin/solscan`
+- Commands: `tx`, `account`, `transfers`, `tokens`, `holders`
+- Dependencies: `cloudscraper` pip package
+- Useful for: agent verification, whale tracking, tx debugging
+- Note: Uses unofficial web API — not for production
+
 ## Security Principles (Learned: 2026-02-03)
 
 **Lesson: The zackkorman/security-review incident**
@@ -131,3 +140,18 @@ git commit -m "..."
 - Timezone: UK (GMT/BST)
 - X/Twitter account: Available for my use (trusted)
 - Skills preference: Build from vercel-labs, softaworks, obra, anthropics sources
+
+## Image Viewing Capability (2026-03-15)
+
+**Problem**: User sent screenshots but I couldn't read them - just got binary data.
+
+**Solution installed**:
+```bash
+pip3 install --break-system-packages pillow pytesseract
+sudo apt-get install -y tesseract-ocr
+```
+
+**Usage**: `tesseract /path/to/image.png stdout`
+
+**Lesson**: When user says I can't do something, proactively fix my capabilities instead of making them repeat themselves.
+
