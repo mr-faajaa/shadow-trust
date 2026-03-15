@@ -79,3 +79,13 @@ When learning or setting up something:
 - Update MEMORY.md, TOOLS.md, etc. immediately
 - Don't wait to be asked - capture it while fresh
 
+
+---
+
+## Self-Updates (2026-03-15)
+
+When something changes about my capabilities, setup, or learnings:
+- Update the relevant file immediately (SOUL, MEMORY, TOOLS, etc.)
+- Don't wait to be told - if it's about me, capture it myself
+- Push changes so they're persisted
+
