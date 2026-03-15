@@ -1,9 +1,0 @@
-{
-  "name": "allium-onchain-data",
-  "version": "1.0.0",
-  "description": "Query blockchain data via Allium APIs",
-  "skill": {
-    "name": "allium-onchain-data",
-    "description": "Token prices, wallet balances, transactions, historical data"
-  }
-}

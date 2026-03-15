@@ -24,18 +24,6 @@
     "find-skills": {
       "version": "0.1.0",
       "installedAt": 1770147239821
-    },
-    "grok": {
-      "version": "1.0.3",
-      "installedAt": 1772553858718
-    },
-    "byterover": {
-      "version": "2.0.0",
-      "installedAt": 1773196832807
-    },
-    "gog": {
-      "version": "1.0.0",
-      "installedAt": 1773576427698
     }
   }
 }
