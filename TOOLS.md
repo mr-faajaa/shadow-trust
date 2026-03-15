@@ -137,3 +137,9 @@ When user reports something doesn't work or I can't do something:
   - `agent-browser --cdp http://100.80.156.2:9222 screenshot` - take screenshot
   - `agent-browser --cdp http://100.80.156.2:9222 snapshot` - get page structure
 
+
+### Local Models (Ollama)
+- **qwen2.5-coder** - 4.7GB, for coding tasks
+- Usage: `ollama run qwen2.5-coder "your prompt"`
+- Start server: `ollama serve`
+
